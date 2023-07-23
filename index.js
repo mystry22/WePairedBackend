@@ -18,20 +18,6 @@ app.use('/api/chat', chat);
 
 
 
-
-
-const format3 = (name, text, key, user_id, room_id) => {
-    return {
-        name: name,
-        text: text,
-        createdAt: moment().format('h:m:a'),
-        key: key,
-        user_id: user_id,
-        room_id: room_id
-    }
-}
-
-
 io.on('connection', async (socket) => {
 
 
@@ -57,13 +43,6 @@ io.on('connection', async (socket) => {
     //Chat Message
     socket.on('chatMessage', async (msg) => {
 
-        
-        // chatArray.push(format3(msg.name, msg.text, msg.key, msg._id, msg.room_id));
-        // const uniqueChat = chatArray.filter(
-        //     function (el) {
-        //         return el.room_id == msg.room_id
-        //     }
-        // );
 
         const data = {
             name: msg.name,
