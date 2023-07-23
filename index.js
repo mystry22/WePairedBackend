@@ -31,11 +31,6 @@ const format3 = (name, text, key, user_id, room_id) => {
     }
 }
 
-let chatArray = [];
-
-
-
-
 
 io.on('connection', async (socket) => {
 
@@ -62,15 +57,34 @@ io.on('connection', async (socket) => {
     //Chat Message
     socket.on('chatMessage', async (msg) => {
 
+        
+        // chatArray.push(format3(msg.name, msg.text, msg.key, msg._id, msg.room_id));
+        // const uniqueChat = chatArray.filter(
+        //     function (el) {
+        //         return el.room_id == msg.room_id
+        //     }
+        // );
+
+        const data = {
+            name: msg.name,
+            text: msg.text,
+            user_id: msg._id,
+            key: msg.key,
+            channel_id: msg.room_id,
+            chat_date: moment().format('h:m:a')
+        }
 
 
-        chatArray.push(format3(msg.name, msg.text, msg.key, msg._id, msg.room_id));
-        const uniqueChat = chatArray.filter(
-            function (el) {
-                return el.room_id == msg.room_id
-            }
-        );
-        io.to(msg.room_id).emit('message', uniqueChat);
+        const readData = {
+            channel_id:msg.room_id,
+        }
+
+        const saved = await createConversation(data);
+        if(saved){
+
+            const readConverse = await readConversation(readData)
+            io.to(msg.room_id).emit('message', readConverse);
+        }
 
 
 
@@ -101,15 +115,15 @@ io.on('connection', async (socket) => {
     });
 
     //Join room
-    socket.on('joinRoom', (user) => {
+    socket.on('joinRoom', async(user) => {
 
         socket.join(user.room_id);
-        const uniqueChat = chatArray.filter(
-            function (el) {
-                return el.room_id == user.room_id
-            }
-        );
-        io.to(user.room_id).emit('message', uniqueChat);
+
+        const readData = {
+            channel_id:user.room_id,
+        }
+        const readConverse = await readConversation(readData)
+        io.to(user.room_id).emit('message', readConverse);
     })
 
     //notify user's of some one leaving
